@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class KanbanBoard extends Component
 {
+    use Concerns\HasBoardNavigation;
+
     public PatientsKanbanBoard $kanbanBoard;
 
     public function mount(PatientsKanbanBoard $patientsKanbanBoard)
@@ -151,6 +153,8 @@ class KanbanBoard extends Component
     public function render()
     {
         $user = Auth::user();
+        $patient = $this->kanbanBoard->patient;
+        $boardNavigation = $this->getBoardNavigation($patient, 'kanban', $this->kanbanBoard->id);
 
         // Load slots with cards and slot relation
         $slots = $this->kanbanBoard->slots()->with(['cards.slot'])->orderBy('order')->get();
@@ -158,6 +162,8 @@ class KanbanBoard extends Component
         return view('patients::livewire.kanban-board', [
             'user' => $user,
             'slots' => $slots,
+            'patient' => $patient,
+            'boardNavigation' => $boardNavigation,
         ])->layout('platform::layouts.app');
     }
 }

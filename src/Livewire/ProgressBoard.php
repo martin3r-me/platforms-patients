@@ -11,6 +11,8 @@ use Livewire\Attributes\On;
 
 class ProgressBoard extends Component
 {
+    use Concerns\HasBoardNavigation;
+
     public PatientsProgressBoard $progressBoard;
 
     public function mount(PatientsProgressBoard $patientsProgressBoard)
@@ -144,6 +146,8 @@ class ProgressBoard extends Component
     public function render()
     {
         $user = Auth::user();
+        $patient = $this->progressBoard->patient;
+        $boardNavigation = $this->getBoardNavigation($patient, 'progress', $this->progressBoard->id);
 
         // Load slots with cards and slot relation
         $slots = $this->progressBoard->slots()->with(['cards.slot'])->orderBy('order')->get();
@@ -151,6 +155,8 @@ class ProgressBoard extends Component
         return view('patients::livewire.progress-board', [
             'user' => $user,
             'slots' => $slots,
+            'patient' => $patient,
+            'boardNavigation' => $boardNavigation,
         ])->layout('platform::layouts.app');
     }
 }

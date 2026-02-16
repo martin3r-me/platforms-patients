@@ -2,62 +2,50 @@
     <x-slot name="navbar">
         <x-ui-page-navbar :title="$anamnesisBoard->name" icon="heroicon-o-document-text">
             <x-slot name="actions">
-                <a href="{{ route('patients.patients.show', $anamnesisBoard->patient) }}" class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors">
-                    @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                    <span>Back to Patient</span>
-                </a>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--ui-muted)]">{{ $patient->name }}</span>
+                    <a href="{{ route('patients.patients.show', $patient) }}" wire:navigate class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-md hover:bg-[var(--ui-muted-5)]">
+                        @svg('heroicon-o-arrow-left', 'w-4 h-4')
+                        <span>Patient</span>
+                    </a>
+                </div>
             </x-slot>
         </x-ui-page-navbar>
     </x-slot>
 
-    <x-ui-page-container spacing="space-y-8">
+    <x-ui-page-container spacing="space-y-6">
         {{-- Header Section --}}
-        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm overflow-hidden">
-            <div class="p-6 lg:p-8">
-                <h1 class="text-3xl font-bold text-[var(--ui-secondary)] mb-4 tracking-tight leading-tight">{{ $anamnesisBoard->name }}</h1>
-                @if($anamnesisBoard->description)
-                    <p class="text-[var(--ui-secondary)] mb-3">{{ $anamnesisBoard->description }}</p>
-                @endif
-                <div 
-                    x-data="{ copied: false }"
-                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg"
-                >
-                    <span class="text-xs font-mono text-[var(--ui-muted)]">{{ $anamnesisBoard->uuid }}</span>
-                    <button
-                        type="button"
-                        @click="
-                            navigator.clipboard.writeText('{{ $anamnesisBoard->uuid }}');
-                            copied = true;
-                            setTimeout(() => copied = false, 2000);
-                        "
-                        class="p-1 rounded hover:bg-white transition-colors"
-                        title="Copy UUID"
-                    >
-                        <span x-show="!copied">
-                            @svg('heroicon-o-clipboard', 'w-3.5 h-3.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                        </span>
-                        <span x-show="copied" x-cloak>
-                            @svg('heroicon-o-check', 'w-3.5 h-3.5 text-green-600')
-                        </span>
-                    </button>
+        <div class="bg-white rounded-xl border border-[var(--ui-border)]/60 shadow-sm p-5">
+            <div class="flex items-start justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50">
+                        @svg('heroicon-o-document-text', 'w-5 h-5 text-blue-600')
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-[var(--ui-secondary)] leading-tight">{{ $anamnesisBoard->name }}</h1>
+                        @if($anamnesisBoard->description)
+                            <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $anamnesisBoard->description }}</p>
+                        @endif
+                        <div class="flex items-center gap-2 mt-1.5 text-xs text-[var(--ui-muted)]">
+                            <span>{{ $patient->name }}</span>
+                            <span>&middot;</span>
+                            <span>{{ $anamnesisBoard->sections->count() }} {{ Str::plural('Section', $anamnesisBoard->sections->count()) }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        {{-- Sections Section --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-[var(--ui-secondary)]">Sections</h2>
                 @can('update', $anamnesisBoard)
                     <x-ui-button variant="primary" size="sm" wire:click="createSection">
-                        <span class="inline-flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5">
                             @svg('heroicon-o-plus', 'w-4 h-4')
-                            <span>Create Section</span>
+                            <span>Section</span>
                         </span>
                     </x-ui-button>
                 @endcan
             </div>
+        </div>
 
+        {{-- Sections --}}
+        <div>
             @if($anamnesisBoard->sections->count() > 0)
                 <div class="space-y-6">
                     @foreach($anamnesisBoard->sections as $section)
@@ -78,29 +66,6 @@
                                     @if($section->description)
                                         <p class="text-sm text-[var(--ui-muted)] mt-1">{{ $section->description }}</p>
                                     @endif
-                                    <div 
-                                        x-data="{ copied: false }"
-                                        class="inline-flex items-center gap-2 px-2 py-1 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
-                                    >
-                                        <span class="font-mono text-[var(--ui-muted)]">{{ $section->uuid }}</span>
-                                        <button
-                                            type="button"
-                                            @click="
-                                                navigator.clipboard.writeText('{{ $section->uuid }}');
-                                                copied = true;
-                                                setTimeout(() => copied = false, 2000);
-                                            "
-                                            class="p-0.5 rounded hover:bg-white transition-colors"
-                                            title="Copy UUID"
-                                        >
-                                            <span x-show="!copied">
-                                                @svg('heroicon-o-clipboard', 'w-3 h-3 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                            </span>
-                                            <span x-show="copied" x-cloak>
-                                                @svg('heroicon-o-check', 'w-3 h-3 text-green-600')
-                                            </span>
-                                        </button>
-                                    </div>
                                 </div>
                                 @can('update', $anamnesisBoard)
                                     <x-ui-button 
@@ -139,32 +104,9 @@
                                                 @php
                                                     $totalSpan = $row->blocks->sum('span');
                                                 @endphp
-                                                <span class="text-xs px-2 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
-                                                    Span: {{ $totalSpan }}/12
+                                                <span class="text-[10px] px-1.5 py-0.5 rounded {{ $totalSpan > 12 ? 'bg-red-100 text-red-700' : ($totalSpan == 12 ? 'bg-green-100 text-green-700' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]') }}">
+                                                    {{ $totalSpan }}/12
                                                 </span>
-                                                <div 
-                                                    x-data="{ copied: false }"
-                                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white border border-[var(--ui-border)]/40 rounded text-xs"
-                                                >
-                                                    <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $row->uuid }}</span>
-                                                    <button
-                                                        type="button"
-                                                        @click="
-                                                            navigator.clipboard.writeText('{{ $row->uuid }}');
-                                                            copied = true;
-                                                            setTimeout(() => copied = false, 2000);
-                                                        "
-                                                        class="p-0.5 rounded hover:bg-[var(--ui-muted-5)] transition-colors"
-                                                        title="Copy UUID"
-                                                    >
-                                                        <span x-show="!copied">
-                                                            @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                                        </span>
-                                                        <span x-show="copied" x-cloak>
-                                                            @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
-                                                        </span>
-                                                    </button>
-                                                </div>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 @can('update', $anamnesisBoard)
@@ -240,29 +182,6 @@
                                                                             <p class="text-xs text-[var(--ui-muted)] italic mt-2">No content yet</p>
                                                                         @endif
                                                                         
-                                                                        <div 
-                                                                            x-data="{ copied: false }"
-                                                                            class="inline-flex items-center gap-1.5 px-2 py-0.5 mt-2 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded text-xs"
-                                                                        >
-                                                                            <span class="font-mono text-[var(--ui-muted)] text-[10px]">{{ $block->uuid }}</span>
-                                                                            <button
-                                                                                type="button"
-                                                                                @click.stop="
-                                                                                    navigator.clipboard.writeText('{{ $block->uuid }}');
-                                                                                    copied = true;
-                                                                                    setTimeout(() => copied = false, 2000);
-                                                                                "
-                                                                                class="p-0.5 rounded hover:bg-white transition-colors"
-                                                                                title="Copy UUID"
-                                                                            >
-                                                                                <span x-show="!copied">
-                                                                                    @svg('heroicon-o-clipboard', 'w-2.5 h-2.5 text-[var(--ui-muted)] hover:text-[var(--ui-primary)]')
-                                                                                </span>
-                                                                                <span x-show="copied" x-cloak>
-                                                                                    @svg('heroicon-o-check', 'w-2.5 h-2.5 text-green-600')
-                                                                                </span>
-                                                                            </button>
-                                                                        </div>
                                                                     </div>
                                                                     @can('update', $anamnesisBoard)
                                                                         <button 
@@ -348,23 +267,15 @@
     </x-ui-page-container>
 
     <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Board Overview" width="w-80" :defaultOpen="true">
-            <div class="p-6 space-y-6">
-                {{-- Navigation --}}
-                <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Navigation</h3>
-                    <div class="flex flex-col gap-2">
-                        <a href="{{ route('patients.patients.show', $anamnesisBoard->patient) }}" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--ui-secondary)] hover:text-[var(--ui-primary)] transition-colors rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]">
-                            @svg('heroicon-o-arrow-left', 'w-4 h-4')
-                            <span>Back to Patient</span>
-                        </a>
-                    </div>
-                </div>
+        <x-ui-page-sidebar title="Board Overview" width="w-72" :defaultOpen="true">
+            <div class="p-4 space-y-5">
+                {{-- Board Navigation --}}
+                @include('patients::livewire.partials.board-navigation', ['boardNavigation' => $boardNavigation, 'patient' => $patient])
 
                 {{-- Actions --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Actions</h3>
-                    <div class="flex flex-col gap-2">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Actions</h3>
+                    <div class="flex flex-col gap-1.5">
                         @can('update', $anamnesisBoard)
                             <x-ui-button variant="secondary-outline" size="sm" x-data @click="$dispatch('open-modal-anamnesis-board-settings', { anamnesisBoardId: {{ $anamnesisBoard->id }} })" class="w-full">
                                 <span class="inline-flex items-center gap-2">
@@ -378,19 +289,17 @@
 
                 {{-- Board Details --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Type</span>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-[var(--ui-primary-10)] text-[var(--ui-primary)] border border-[var(--ui-primary)]/20">
-                                Anamnesis Board
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-[var(--ui-muted)] mb-2">Details</h3>
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center py-1.5 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg text-sm">
+                            <span class="text-[var(--ui-muted)]">Type</span>
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                                Anamnesis
                             </span>
                         </div>
-                        <div class="flex justify-between items-center py-2 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg">
-                            <span class="text-sm text-[var(--ui-muted)]">Created</span>
-                            <span class="text-sm text-[var(--ui-secondary)] font-medium">
-                                {{ $anamnesisBoard->created_at->format('d.m.Y') }}
-                            </span>
+                        <div class="flex justify-between items-center py-1.5 px-3 bg-[var(--ui-muted-5)] border border-[var(--ui-border)]/40 rounded-lg text-sm">
+                            <span class="text-[var(--ui-muted)]">Created</span>
+                            <span class="text-[var(--ui-secondary)] font-medium">{{ $anamnesisBoard->created_at->format('d.m.Y') }}</span>
                         </div>
                     </div>
                 </div>

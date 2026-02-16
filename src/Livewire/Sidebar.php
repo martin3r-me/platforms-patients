@@ -10,17 +10,17 @@ use Livewire\Attributes\On;
 class Sidebar extends Component
 {
     public bool $showAllPatients = false;
+    public string $search = '';
 
     public function mount()
     {
-        // Load state from localStorage (set by frontend)
-        $this->showAllPatients = false; // Default value, overridden by frontend
+        $this->showAllPatients = false;
     }
 
-    #[On('updateSidebar')] 
+    #[On('updateSidebar')]
     public function updateSidebar()
     {
-        // Will be implemented later
+        // Refresh patient list
     }
 
     public function toggleShowAllPatients()
@@ -28,11 +28,16 @@ class Sidebar extends Component
         $this->showAllPatients = !$this->showAllPatients;
     }
 
+    public function updatedSearch()
+    {
+        // Livewire auto-updates on property change
+    }
+
     public function createPatient()
     {
         $user = Auth::user();
         $team = $user->currentTeam;
-        
+
         if (!$team) {
             return;
         }
@@ -48,7 +53,7 @@ class Sidebar extends Component
         ]);
 
         $this->dispatch('updateSidebar');
-        
+
         // Redirect to patient view
         return $this->redirect(route('patients.patients.show', $patient), navigate: true);
     }
@@ -66,23 +71,28 @@ class Sidebar extends Component
             ]);
         }
 
-        // All patients of the team
-        $allPatients = PatientsPatient::query()
+        // Build query with search
+        $query = PatientsPatient::query()
             ->where('team_id', $teamId)
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
 
-        // Filter patients: all or specific ones (extensible later)
-        $patientsToShow = $this->showAllPatients
-            ? $allPatients
-            : $allPatients; // Later: only patients matching specific criteria
+        // Apply search filter
+        if (!empty($this->search)) {
+            $searchTerm = $this->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
 
-        $hasMorePatients = false; // Later: when filter logic is implemented
+        $allPatientsCount = PatientsPatient::where('team_id', $teamId)->count();
+        $patients = $query->get();
+        $hasMorePatients = false;
 
         return view('patients::livewire.sidebar', [
-            'patients' => $patientsToShow,
+            'patients' => $patients,
             'hasMorePatients' => $hasMorePatients,
-            'allPatientsCount' => $allPatients->count(),
+            'allPatientsCount' => $allPatientsCount,
         ]);
     }
 }

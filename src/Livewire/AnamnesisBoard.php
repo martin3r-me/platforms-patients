@@ -9,6 +9,8 @@ use Livewire\Attributes\On;
 
 class AnamnesisBoard extends Component
 {
+    use Concerns\HasBoardNavigation;
+
     public PatientsAnamnesisBoard $anamnesisBoard;
 
     public function mount(PatientsAnamnesisBoard $patientsAnamnesisBoard)
@@ -294,9 +296,13 @@ class AnamnesisBoard extends Component
     public function render()
     {
         $user = Auth::user();
+        $patient = $this->anamnesisBoard->patient;
+        $boardNavigation = $this->getBoardNavigation($patient, 'anamnesis', $this->anamnesisBoard->id);
 
         return view('patients::livewire.anamnesis-board', [
             'user' => $user,
+            'patient' => $patient,
+            'boardNavigation' => $boardNavigation,
         ])->layout('platform::layouts.app');
     }
 }
