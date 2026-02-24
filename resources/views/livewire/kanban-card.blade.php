@@ -87,6 +87,7 @@
 
                 <x-core-extra-fields-section
                     :definitions="$this->extraFieldDefinitions"
+                    :model="$card"
                     class="mt-8"
                 />
             </div>
