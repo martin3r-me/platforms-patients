@@ -25,8 +25,8 @@ class KanbanCard extends Component
         $this->title = $this->card->title ?? '';
         $this->description = $this->card->description ?? '';
 
-        // Load extra fields (definitions from board, values from card)
-        $this->loadExtraFieldValuesFromParent($this->card, $this->card->kanbanBoard);
+        // Load extra fields (inherited definitions from board + own values)
+        $this->loadExtraFieldValues($this->card);
     }
 
     #[On('updateKanbanCard')]
@@ -59,8 +59,8 @@ class KanbanCard extends Component
         $this->card->refresh();
         $this->title = $this->card->title ?? '';
 
-        // Reload extra fields (definitions from board)
-        $this->loadExtraFieldValuesFromParent($this->card, $this->card->kanbanBoard);
+        // Reload extra fields
+        $this->loadExtraFieldValues($this->card);
 
         // UI can show "saved"
         $this->dispatch('patients-kanban-saved', [

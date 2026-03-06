@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Core\Contracts\HasDisplayName;
+use Platform\Core\Contracts\InheritsExtraFields;
 use Platform\Core\Traits\HasExtraFields;
 
 /**
@@ -13,7 +14,7 @@ use Platform\Core\Traits\HasExtraFields;
  *
  * Cards are the individual entries within a slot
  */
-class PatientsKanbanCard extends Model implements HasDisplayName
+class PatientsKanbanCard extends Model implements HasDisplayName, InheritsExtraFields
 {
     use HasExtraFields;
     protected $table = 'patients_kanban_cards';
@@ -74,5 +75,13 @@ class PatientsKanbanCard extends Model implements HasDisplayName
     public function getDisplayName(): ?string
     {
         return $this->title;
+    }
+
+    /**
+     * Cards erben Extra-Felder vom zugeordneten Kanban-Board.
+     */
+    public function extraFieldParents(): array
+    {
+        return array_filter([$this->kanbanBoard]);
     }
 }
