@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 use Platform\Organization\Traits\HasOrganizationContexts;
 use Platform\Core\Traits\HasColors;
-use Platform\Core\Contracts\HasTimeAncestors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
 use Platform\Crm\Traits\HasCompanyLinksTrait;
@@ -17,7 +16,7 @@ use Platform\Crm\Contracts\ContactInterface;
 /**
  * @ai.description Patient serves as a container for the patient record within the team.
  */
-class PatientsPatient extends Model implements HasTimeAncestors, HasKeyResultAncestors, HasDisplayName
+class PatientsPatient extends Model implements HasKeyResultAncestors, HasDisplayName
 {
     use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
 
@@ -115,11 +114,6 @@ class PatientsPatient extends Model implements HasTimeAncestors, HasKeyResultAnc
     public function getContact(): ?ContactInterface
     {
         return $this->crmContactLinks()->first()?->contact;
-    }
-
-    public function timeAncestors(): array
-    {
-        return [];
     }
 
     public function keyResultAncestors(): array
