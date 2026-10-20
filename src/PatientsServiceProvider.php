@@ -3,7 +3,6 @@
 namespace Platform\Patients;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -49,7 +48,7 @@ class PatientsServiceProvider extends ServiceProvider
         if (
             config()->has('patients.routing') &&
             config()->has('patients.navigation') &&
-            Schema::hasTable('modules')
+            PlatformCore::modulesTableExists()
         ) {
             PlatformCore::registerModule([
                 'key'        => 'patients',
