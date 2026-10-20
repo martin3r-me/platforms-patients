@@ -5,7 +5,6 @@ namespace Platform\Patients\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
-use Platform\Organization\Traits\HasOrganizationContexts;
 use Platform\Core\Traits\HasColors;
 use Platform\Core\Contracts\HasKeyResultAncestors;
 use Platform\Core\Contracts\HasDisplayName;
@@ -18,7 +17,7 @@ use Platform\Crm\Contracts\ContactInterface;
  */
 class PatientsPatient extends Model implements HasKeyResultAncestors, HasDisplayName
 {
-    use HasOrganizationContexts, HasColors, HasCompanyLinksTrait;
+    use HasColors, HasCompanyLinksTrait;
 
     protected $table = 'patients_patients';
 
